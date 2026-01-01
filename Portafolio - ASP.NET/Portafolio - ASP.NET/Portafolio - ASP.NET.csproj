@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Portafolio___ASP.NET</RootNamespace>
+    <UserSecretsId>3d57f4fc-e914-446c-8e1e-f9aa3461f77d</UserSecretsId>
   </PropertyGroup>
 
 </Project>

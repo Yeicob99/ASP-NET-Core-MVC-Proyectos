@@ -1,64 +1,59 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Portafolio___ASP.NET.Models;
+using Portafolio___ASP.NET.Servicios;
 
 namespace Portafolio___ASP.NET.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IRepositorioProyectos repositorioProyectos;
+        private readonly IServicioEmail servicioEmail;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,
+            IRepositorioProyectos repositorioProyectos, IServicioEmail servicioEmail)
         {
             _logger = logger;
+            this.repositorioProyectos = repositorioProyectos;
+            this.servicioEmail = servicioEmail;
         }
 
         public IActionResult Index()
         {
-            var proyectos = ObtenerProyectos().Take(3).ToList();
-            var modelo = new HomeIndexViewModel() { Proyectos = proyectos };
-            return View(modelo);
+            _logger.LogInformation("Este es un mensaje de log");
+            var proyectos = repositorioProyectos.ObtenerProyectos().Take(3).ToList();
 
-
-
-        }
-
-        private List<ProyectoDTO> ObtenerProyectos()
-        {
-            return new List<ProyectoDTO>()
+            var modelo = new HomeIndexViewModel()
             {
-                new ProyectoDTO
-                {
-                    Titulo = "Amazon",
-                    Descripcion = "Clon de Amazon hecho en ASP.NET Core y Blazor",
-                    Link = "https://www.amazon.com/",
-                    ImagenUrl = "img/amazon.png"
-                },
-                new ProyectoDTO
-                {
-                    Titulo = "New York Times",
-                    Descripcion = "Pagina de noticias en React",
-                    Link = "https://www.nytimes.com/",
-                    ImagenUrl = "img/nyt.png"
-                },
-                new ProyectoDTO
-                {
-                    Titulo = "Reddit",
-                    Descripcion = "Red social para compartir en comunidades",
-                    Link = "https://www.reddit.com/",
-                    ImagenUrl = "img/reddit.png"
-                },
-                new ProyectoDTO
-                {
-                    Titulo = "Steam",
-                    Descripcion = "Tienda en linea para comprar videojuegos",
-                    Link = "https://store.steampowered.com/",
-                    ImagenUrl = "img/steam.png"
-                },
+                Proyectos = proyectos,
             };
+            return View(modelo);
         }
 
+        public IActionResult Proyectos()
+        {
+            var proyectos = repositorioProyectos.ObtenerProyectos();
 
+            return View(proyectos);
+        }
+
+        public IActionResult Contacto()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Contacto(ContactoViewModel contactoViewModel)
+        {
+            await servicioEmail.Enviar(contactoViewModel);
+            return RedirectToAction("Gracias");
+        }
+
+        public IActionResult Gracias()
+        {
+            return View();
+        }
 
         public IActionResult Privacy()
         {
